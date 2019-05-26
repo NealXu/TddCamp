@@ -1,4 +1,4 @@
-
+import org.scalatest.FlatSpec
 
 class FizzBuzzFromSemanticModelTest extends FlatSpec {
 
