@@ -5,27 +5,37 @@ import org.scalatest.BeforeAndAfterAll
 
 class ArgsTest extends FlatSpec with BeforeAndAfterAll {
 
-  private val flags = List(("l", ""), ("p", "#"), ("d", "*"))
+  private val flagLog = "l"
+  private val flagLogType = ""
+  private val flagPort = "p"
+  private val flagPortType = "#"
+  private val flagDir = "d"
+  private val flagDirType = "*"
+  private val flagInvalid = "3"
+  private val flags = Map((flagLog, flagLogType), (flagPort, flagPortType), (flagDir, flagDirType))
+
   private val schema = flags.map(x => x._1 + x._2).mkString(",")
 
-  private var args: Args = _
+  private var argsParser: Args = _
+
+  private val args = Array("-l", "-p 8080", "-d /user/log")
 
   override def beforeAll(): Unit = {
-    args = new Args(schema)
+    argsParser = new Args(schema, args)
   }
 
   override def afterAll(): Unit = {
-    args = _
+    argsParser = null
   }
 
   "Specify valid flag key" should "get flay type" in {
-    assertResult(Some(""))(args.querySchemaBy("l"))
-    assertResult(Some("#"))(args.querySchemaBy("p"))
-    assertResult(Some("*"))(args.querySchemaBy("d"))
+    assertResult(Some(flagLogType))(argsParser.querySchemaBy(flagLog))
+    assertResult(Some(flagDirType))(argsParser.querySchemaBy(flagDir))
+    assertResult(Some(flagPortType))(argsParser.querySchemaBy(flagPort))
   }
 
   "Specify invalid flag key" should "get none" in {
-    assertResult(None)(args.querySchemaBy("a"))
+    assertResult(None)(argsParser.querySchemaBy(flagInvalid))
   }
 
 
