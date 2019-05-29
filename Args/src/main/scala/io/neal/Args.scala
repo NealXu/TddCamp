@@ -2,6 +2,14 @@ package io.neal
 
 class Args(schema: String, args: Array[String] = Array.empty) {
 
+  private lazy val parsedArgs = {
+    if (args.isEmpty) {
+      Map.empty
+    } else {
+      
+    }
+  }
+
   private lazy val internalSchema = {
     val items = schema.split(",").map(_.trim).filter(_.nonEmpty)
     val pattern = "([a-zA-Z])(.*)".r
@@ -15,6 +23,10 @@ class Args(schema: String, args: Array[String] = Array.empty) {
 
   def querySchemaBy(key: String): Option[String] = {
     internalSchema.get(key)
+  }
+
+  def queryArgBy(key: String): Option[Any] = {
+
   }
 
 }
