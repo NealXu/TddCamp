@@ -5,6 +5,8 @@ import org.scalatest.BeforeAndAfterAll
 
 class ArgsTest extends FlatSpec with BeforeAndAfterAll {
 
+  import Args._
+
   private val flagLog = "l"
   private val flagLogType = ""
   private val flagPort = "p"
@@ -18,17 +20,10 @@ class ArgsTest extends FlatSpec with BeforeAndAfterAll {
   private val minusSign = "-"
   private val port = 8080
   private val dir = "/usr/log"
-  private val argsValid1 = Array(s"$minusSign$flagLog", s"$minusSign$flagPort", s"$port", s"$minusSign$flagDir", s"$dir")
-  private val argsInvalid1 = Array(s"$minusSign")
-
-//  private var argsParser: Args = _
-//  override def beforeAll(): Unit = {
-//    argsParser = new Args(schema, argsValid1)
-//  }
-//
-//  override def afterAll(): Unit = {
-//    argsParser = null
-//  }
+  private val argsAll = Array(s"$minusSign$flagLog", s"$minusSign$flagPort", s"$port", s"$minusSign$flagDir", s"$dir")
+  private val argsWithoutLogFlag = Array(s"$minusSign$flagPort", s"$port", s"$minusSign$flagDir", s"$dir")
+  private val argsWithoutPortFlag = Array(s"$minusSign$flagLog", s"$minusSign$flagDir", s"$dir")
+  private val argsWithoutDirFlag = Array(s"$minusSign$flagLog", s"$minusSign$flagPort", s"$port")
 
   "Specify valid flag key" should "get flay type" in {
     val argsParser = new Args(schema)
@@ -43,8 +38,32 @@ class ArgsTest extends FlatSpec with BeforeAndAfterAll {
   }
 
   "Specify log flag, and query value" should "be returned with true" in {
-    val argsParser = new Args(schema, argsValid1)
+    val argsParser = new Args(schema, argsAll)
     assertResult(Some(true))(argsParser.queryArgBy(flagLog))
   }
 
+  "Specify port flag, and query flag value" should "be returned with port number" in {
+    val argsParser = new Args(schema, argsAll)
+    assertResult(Some(port))(argsParser.queryArgBy(flagPort))
+  }
+
+  "Specify dir flag, and query flag value" should "be returned with dir string" in {
+    val argsParser = new Args(schema, argsAll)
+    assertResult(Some(dir))(argsParser.queryArgBy(flagDir))
+  }
+
+  "Not specify log flag, and query value" should "be returned with default value(false)" in {
+    val argsParser = new Args(schema, argsWithoutLogFlag)
+    assertResult(Some(BooleanDefault))(argsParser.queryArgBy(flagLog))
+  }
+
+  "Not specify port flag, and query value" should "be returned with default value(0)" in {
+    val argsParser = new Args(schema, argsWithoutPortFlag)
+    assertResult(Some(IntDefault))(argsParser.queryArgBy(flagPort))
+  }
+
+  "Not specify dir flag, and query value" should "be returned with default value(\"\")" in {
+    val argsParser = new Args(schema, argsWithoutDirFlag)
+    assertResult(Some(StringDefault))(argsParser.queryArgBy(flagDir))
+  }
 }
